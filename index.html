@@ -7,7 +7,7 @@
 <style>
   :root{
     --ink:#1b1033;
-    --paper:#fff7ec;
+    --paper:#2c4a95;
     --pink:#ff5d8f;
     --purple:#9b5de5;
     --blue:#00bbf9;
@@ -21,10 +21,33 @@
 
   body{
     font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
-    background:var(--paper);
+    background-color:var(--paper);
     color:var(--ink);
     overflow-x:hidden;
     line-height:1.6;
+  }
+
+  /* ---------- cute bamboo-munching pandas ---------- */
+  .panda{
+    position:fixed;
+    z-index:0;
+    pointer-events:none;
+    white-space:nowrap;
+    animation:bob 3s ease-in-out infinite;
+  }
+  .panda .bear{display:inline-block;animation:munch 1.1s ease-in-out infinite;transform-origin:bottom center}
+  .panda.p1{top:16%;left:6%;font-size:3rem}
+  .panda.p2{top:46%;right:7%;font-size:3.6rem;animation-delay:-1.2s}
+  .panda.p3{bottom:12%;left:12%;font-size:2.4rem;animation-delay:-2s}
+  .panda.p2 .bear{animation-delay:-.5s}
+  .panda.p3 .bear{animation-delay:-.8s}
+  @keyframes bob{
+    0%,100%{transform:translateY(0) rotate(-3deg)}
+    50%{transform:translateY(-14px) rotate(3deg)}
+  }
+  @keyframes munch{
+    0%,100%{transform:scale(1,1)}
+    50%{transform:scale(1.08,.9) translateX(3px)}
   }
 
   /* ---------- floating blobs background ---------- */
@@ -36,9 +59,9 @@
     z-index:0;
     animation:float 14s ease-in-out infinite;
   }
-  .blob.b1{width:340px;height:340px;background:var(--pink);top:-80px;left:-60px}
+  .blob.b1{width:340px;height:340px;background:var(--green);top:-80px;left:-60px}
   .blob.b2{width:300px;height:300px;background:var(--blue);bottom:-90px;right:-50px;animation-delay:-4s}
-  .blob.b3{width:260px;height:260px;background:var(--yellow);top:40%;right:20%;animation-delay:-8s}
+  .blob.b3{width:260px;height:260px;background:var(--green);top:40%;right:20%;animation-delay:-8s}
 
   @keyframes float{
     0%,100%{transform:translate(0,0) scale(1)}
@@ -76,26 +99,29 @@
     letter-spacing:-2px;
     margin:.2em 0 .1em;
     font-weight:900;
+    position:relative;
+    display:inline-block;
   }
   h1 .name{
-    background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    background-size:200% auto;
-    animation:shine 5s linear infinite;
+    color:#87ceeb;
   }
   @keyframes shine{to{background-position:200% center}}
-  h1 .bang{color:var(--pink)}
+  h1 .bang{
+    background:linear-gradient(150deg,#ffffff 0%,#ffffff 22%,#1e6fff 60%,#1e6fff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
   h1 .greeting{color:#ffb3c8}
+  h1 .heart{font-size:3em;position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:24px;line-height:1}
   .tagline{
     font-size:clamp(1.1rem,3vw,1.6rem);
     max-width:34ch;
-    color:#5a4a7a;
+    color:#cdd7ff;
     margin-bottom:1.6em;
   }
   .scroll-hint{
     display:inline-flex;align-items:center;gap:.5em;
     font-weight:700;text-decoration:none;color:var(--ink);
-    background:var(--yellow);
+    background:#87ceeb;
     padding:.8em 1.4em;border-radius:999px;
     border:3px solid var(--ink);
     box-shadow:5px 5px 0 var(--ink);
@@ -111,13 +137,23 @@
     font-weight:900;text-transform:uppercase;letter-spacing:2px;
     font-size:.8rem;
     padding:.35em .8em;border-radius:999px;
-    background:var(--ink);color:var(--paper);
+    background:#fff;color:var(--ink);
     margin-bottom:1rem;
   }
-  h2{font-size:clamp(2rem,7vw,3.2rem);letter-spacing:-1px;margin-bottom:.6em;font-weight:900}
+  h2{font-size:clamp(2rem,7vw,3.2rem);letter-spacing:-1px;margin-bottom:.6em;font-weight:900;color:#fff}
+  #about h2{
+    background:linear-gradient(160deg,#bfe3f5 0%,#7fbdf0 35%,#1e6fff 75%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  #skills h2{color:#ffb3c8}
+  #talents h2{color:var(--pink)}
+  #family h2{color:#2fe0c8}
+  #songs h2{color:var(--pink)}
+  #sports h2{color:#2fe0c8}
+  #play h2{color:#2fe0c8}
 
   .about-card{
-    background:#fff;
+    background-color:#bfe3f5;
     border:3px solid var(--ink);
     border-radius:24px;
     padding:36px;
@@ -145,13 +181,78 @@
   .chip:nth-child(5n+4){background:var(--green)}
   .chip:nth-child(5n+5){background:var(--purple);color:#fff}
 
+  /* ---------- talents ---------- */
+  .talents{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:18px;
+  }
+  .talent-card{
+    background:#fff;
+    border:3px solid var(--ink);
+    border-radius:20px;
+    padding:24px;
+    box-shadow:6px 6px 0 var(--blue);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .talent-card:nth-child(2n){box-shadow:6px 6px 0 var(--pink)}
+  .talent-card:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--purple)}
+  .talent-emoji{font-size:2.6rem;display:block;margin-bottom:.3em}
+  .talent-card h3{font-size:1.3rem;font-weight:900;margin-bottom:.2em}
+  .talent-card p{font-size:1rem;color:#4a6a55}
+  #talents .talent-card:nth-child(1){background:#3aa0f5}
+  #talents .talent-card:nth-child(2){background:#1fc4b3}
+  #talents .talent-card h3{color:#fff}
+  #talents .talent-card p{color:#f0faff}
+  #family .talent-card:nth-child(1){background:#cdb8f2}
+  #family .talent-card:nth-child(2){background:#ffe89a}
+
+  /* ---------- fav songs ---------- */
+  .songs{display:flex;flex-direction:column;gap:12px;max-width:520px}
+  .song{
+    display:flex;align-items:center;gap:.7em;
+    font-weight:700;font-size:1.1rem;
+    background:#fffce0;color:var(--ink);
+    border:3px solid var(--ink);
+    border-radius:16px;
+    padding:.8em 1.1em;
+    box-shadow:4px 4px 0 var(--ink);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .song:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .song-emoji{font-size:1.4rem;color:#ffb3c8}
+  #songs h2 .note{color:#ffb3c8}
+  .song em{font-style:normal;font-weight:600;color:#7a6a95}
+
+  /* ---------- favorite foods ---------- */
+  .foods{display:flex;flex-wrap:wrap;gap:14px}
+  .food{
+    display:inline-flex;align-items:center;gap:.5em;
+    font-weight:800;font-size:1.1rem;
+    padding:.6em 1.1em;
+    border-radius:999px;
+    border:3px solid var(--ink);
+    background:#fff;
+    box-shadow:4px 4px 0 var(--ink);
+    transition:transform .15s ease, box-shadow .15s ease;
+    cursor:default;
+  }
+  .food:hover{transform:translate(-2px,-2px) rotate(-2deg);box-shadow:6px 6px 0 var(--ink)}
+  .food:nth-child(odd){background:var(--pink);color:#fff}
+  .food:nth-child(even){background:#89cff0;color:var(--ink)}
+  .food-emoji{font-size:1.5rem}
+
   /* ---------- footer ---------- */
   footer{
     text-align:center;
     padding:70px 24px 90px;
     position:relative;z-index:1;
   }
-  footer h3{font-size:clamp(1.6rem,5vw,2.4rem);margin-bottom:.4em;font-weight:900}
+  footer h3{
+    font-size:clamp(1.6rem,5vw,2.4rem);margin-bottom:.4em;font-weight:900;
+    background:linear-gradient(150deg,#ff9dbb 0%,#ff9dbb 22%,#1e6fff 62%,#1e6fff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
   .mail{
     display:inline-block;
     font-weight:800;font-size:1.2rem;
@@ -160,7 +261,7 @@
     padding-bottom:2px;
   }
   .mail:hover{border-color:var(--blue)}
-  .tiny{margin-top:2.5em;font-size:.85rem;color:#8a7ba8}
+  .tiny{margin-top:2.5em;font-size:.85rem;color:#aab6e8}
 
   /* fade-in on scroll */
   .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease, transform .7s ease}
@@ -169,13 +270,8 @@
 </head>
 <body>
 
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-
   <header>
-    <span class="wave">👋</span>
-    <h1><span class="greeting">Hi, I'm</span><br><span class="name">Latoya</span><span class="bang">!</span></h1>
+    <h1><span class="greeting">Hi, I'm</span><br><span class="name">Latoya</span><span class="bang">!</span> <span class="heart">🩵</span></h1>
     <p class="tagline">A curious student figuring things out, learning fast, and building along the way.</p>
     <a class="scroll-hint" href="#about">Get to know me ↓</a>
   </header>
@@ -199,20 +295,97 @@
         <span class="chip">Fast learner</span>
         <span class="chip">Creative thinking</span>
         <span class="chip">Problem solving</span>
-        <span class="chip">Communication</span>
-        <span class="chip">Teamwork</span>
+        <span class="chip">Great helper</span>
         <span class="chip">Organization</span>
         <span class="chip">Adaptability</span>
         <span class="chip">Writing</span>
         <span class="chip">Research</span>
+        <span class="chip">Math</span>
+        <span class="chip">Science</span>
+      </div>
+    </section>
+
+    <section id="talents" class="reveal">
+      <span class="eyebrow">My talents</span>
+      <h2>Things I love to do</h2>
+      <div class="talents">
+        <div class="talent-card">
+          <span class="talent-emoji">🥋</span>
+          <h3>Taekwondo</h3>
+          <p>Building focus, discipline, and strong kicks.</p>
+        </div>
+        <div class="talent-card">
+          <span class="talent-emoji">🏊</span>
+          <h3>Swimming</h3>
+          <p>Feeling right at home in the water.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="foods" class="reveal">
+      <span class="eyebrow">Favorite foods</span>
+      <h2><span style="color:#89cff0">Yum!</span></h2>
+      <div class="foods">
+        <span class="food"><span class="food-emoji">🍪</span>Cookies</span>
+        <span class="food"><span class="food-emoji">🍝</span>Spaghetti</span>
+        <span class="food"><span class="food-emoji">🍔</span>Burger</span>
+      </div>
+    </section>
+
+    <section id="family" class="reveal">
+      <span class="eyebrow">Family time</span>
+      <h2>Things I like to do with my family</h2>
+      <div class="talents">
+        <div class="talent-card">
+          <h3 style="color:#3a1d6e">Playing together</h3>
+          <p>Having fun and making memories as a family.</p>
+        </div>
+        <div class="talent-card">
+          <h3 style="color:var(--purple)">Going to new states</h3>
+          <p>Traveling and exploring new places together.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="songs" class="reveal">
+      <span class="eyebrow">Fav songs</span>
+      <h2>KATSEYE <span class="note">♫</span></h2>
+      <div class="songs">
+        <div class="song"><span class="song-emoji">♫</span><span>Debut</span></div>
+        <div class="song"><span class="song-emoji">♫</span><span>Touch</span></div>
+        <div class="song"><span class="song-emoji">♫</span><span>Gameboy</span></div>
+        <div class="song"><span class="song-emoji">♫</span><span>Iconic by Mistake</span></div>
+        <div class="song"><span class="song-emoji">♫</span><span>Gnarly</span></div>
+        <div class="song"><span class="song-emoji">♫</span><span>Gabriela</span></div>
+      </div>
+    </section>
+
+    <section id="sports" class="reveal">
+      <span class="eyebrow">Favorite sports</span>
+      <h2>Let's play!</h2>
+      <div class="foods">
+        <span class="food"><span class="food-emoji">🥋</span>Taekwondo</span>
+        <span class="food"><span class="food-emoji">🏊</span>Swimming</span>
+        <span class="food"><span class="food-emoji">🏐</span>Volleyball</span>
+        <span class="food"><span class="food-emoji">🏀</span>Basketball</span>
+      </div>
+    </section>
+
+    <section id="play" class="reveal">
+      <span class="eyebrow">Things I like to play with</span>
+      <h2>Fun stuff</h2>
+      <div class="foods">
+        <span class="food"><span class="food-emoji">🌀</span>Fidgets</span>
+        <span class="food"><span class="food-emoji">🫧</span>Squishies</span>
+        <span class="food"><span class="food-emoji">🧈</span>Butter squishy</span>
+        <span class="food"><span class="food-emoji">🧀</span>Cheese squishy</span>
       </div>
     </section>
 
   </div>
 
   <footer class="reveal">
-    <h3>Let's say hi 👋</h3>
-    <p><a class="mail" href="mailto:yuxiaobohit@gmail.com">yuxiaobohit@gmail.com</a></p>
+    <h3>Thanks for stopping by</h3>
     <p class="tiny">Made with ☕ &amp; curiosity · © <span id="year"></span> Latoya</p>
   </footer>
 
