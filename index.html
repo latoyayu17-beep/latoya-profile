@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latoya — Hello!</title>
+<style>
+  :root{
+    --ink:#1b1033;
+    --paper:#fff7ec;
+    --pink:#ff5d8f;
+    --purple:#9b5de5;
+    --blue:#00bbf9;
+    --yellow:#ffd23f;
+    --green:#3ddc97;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    overflow-x:hidden;
+    line-height:1.6;
+  }
+
+  /* ---------- floating blobs background ---------- */
+  .blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(40px);
+    opacity:.55;
+    z-index:0;
+    animation:float 14s ease-in-out infinite;
+  }
+  .blob.b1{width:340px;height:340px;background:var(--pink);top:-80px;left:-60px}
+  .blob.b2{width:300px;height:300px;background:var(--blue);bottom:-90px;right:-50px;animation-delay:-4s}
+  .blob.b3{width:260px;height:260px;background:var(--yellow);top:40%;right:20%;animation-delay:-8s}
+
+  @keyframes float{
+    0%,100%{transform:translate(0,0) scale(1)}
+    33%{transform:translate(30px,-40px) scale(1.08)}
+    66%{transform:translate(-25px,25px) scale(.95)}
+  }
+
+  .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px}
+
+  /* ---------- hero ---------- */
+  header{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    padding:0 24px;
+    max-width:900px;
+    margin:0 auto;
+    position:relative;
+    z-index:1;
+  }
+  .wave{font-size:4rem;display:inline-block;transform-origin:70% 70%;animation:wave 2.4s ease-in-out infinite}
+  @keyframes wave{
+    0%,60%,100%{transform:rotate(0)}
+    10%{transform:rotate(18deg)}
+    20%{transform:rotate(-8deg)}
+    30%{transform:rotate(18deg)}
+    40%{transform:rotate(-4deg)}
+    50%{transform:rotate(10deg)}
+  }
+  h1{
+    font-size:clamp(3rem,12vw,7rem);
+    line-height:.95;
+    letter-spacing:-2px;
+    margin:.2em 0 .1em;
+    font-weight:900;
+  }
+  h1 .name{
+    background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:200% auto;
+    animation:shine 5s linear infinite;
+  }
+  @keyframes shine{to{background-position:200% center}}
+  h1 .bang{color:var(--pink)}
+  h1 .greeting{color:#ffb3c8}
+  .tagline{
+    font-size:clamp(1.1rem,3vw,1.6rem);
+    max-width:34ch;
+    color:#5a4a7a;
+    margin-bottom:1.6em;
+  }
+  .scroll-hint{
+    display:inline-flex;align-items:center;gap:.5em;
+    font-weight:700;text-decoration:none;color:var(--ink);
+    background:var(--yellow);
+    padding:.8em 1.4em;border-radius:999px;
+    border:3px solid var(--ink);
+    box-shadow:5px 5px 0 var(--ink);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .scroll-hint:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+  .scroll-hint:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+
+  /* ---------- sections ---------- */
+  section{padding:80px 0;position:relative;z-index:1}
+  .eyebrow{
+    display:inline-block;
+    font-weight:900;text-transform:uppercase;letter-spacing:2px;
+    font-size:.8rem;
+    padding:.35em .8em;border-radius:999px;
+    background:var(--ink);color:var(--paper);
+    margin-bottom:1rem;
+  }
+  h2{font-size:clamp(2rem,7vw,3.2rem);letter-spacing:-1px;margin-bottom:.6em;font-weight:900}
+
+  .about-card{
+    background:#fff;
+    border:3px solid var(--ink);
+    border-radius:24px;
+    padding:36px;
+    box-shadow:8px 8px 0 var(--purple);
+    font-size:1.15rem;
+  }
+  .about-card p+p{margin-top:1em}
+
+  /* ---------- skills ---------- */
+  .skills{display:flex;flex-wrap:wrap;gap:14px}
+  .chip{
+    font-weight:800;
+    padding:.7em 1.2em;
+    border-radius:999px;
+    border:3px solid var(--ink);
+    background:#fff;
+    box-shadow:4px 4px 0 var(--ink);
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    cursor:default;
+  }
+  .chip:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .chip:nth-child(5n+1){background:var(--pink);color:#fff}
+  .chip:nth-child(5n+2){background:var(--blue);color:#fff}
+  .chip:nth-child(5n+3){background:var(--yellow)}
+  .chip:nth-child(5n+4){background:var(--green)}
+  .chip:nth-child(5n+5){background:var(--purple);color:#fff}
+
+  /* ---------- footer ---------- */
+  footer{
+    text-align:center;
+    padding:70px 24px 90px;
+    position:relative;z-index:1;
+  }
+  footer h3{font-size:clamp(1.6rem,5vw,2.4rem);margin-bottom:.4em;font-weight:900}
+  .mail{
+    display:inline-block;
+    font-weight:800;font-size:1.2rem;
+    text-decoration:none;color:var(--ink);
+    border-bottom:4px solid var(--pink);
+    padding-bottom:2px;
+  }
+  .mail:hover{border-color:var(--blue)}
+  .tiny{margin-top:2.5em;font-size:.85rem;color:#8a7ba8}
+
+  /* fade-in on scroll */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease, transform .7s ease}
+  .reveal.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <header>
+    <span class="wave">👋</span>
+    <h1><span class="greeting">Hi, I'm</span><br><span class="name">Latoya</span><span class="bang">!</span></h1>
+    <p class="tagline">A curious student figuring things out, learning fast, and building along the way.</p>
+    <a class="scroll-hint" href="#about">Get to know me ↓</a>
+  </header>
+
+  <div class="wrap">
+
+    <section id="about" class="reveal">
+      <span class="eyebrow">About me</span>
+      <h2>The short version</h2>
+      <div class="about-card">
+        <p>Hey! I'm Latoya — a student who loves exploring new ideas and isn't afraid to try things I haven't done before. I'm still discovering exactly where I want to go, and honestly, that's the fun part.</p>
+        <p>When I'm curious about something, I dive in. I care about learning by doing, asking good questions, and doing work I can be proud of. This little corner of the web is where I keep track of who I'm becoming.</p>
+      </div>
+    </section>
+
+    <section id="skills" class="reveal">
+      <span class="eyebrow">Skills</span>
+      <h2>Things I'm good at (and growing)</h2>
+      <div class="skills">
+        <span class="chip">Curiosity</span>
+        <span class="chip">Fast learner</span>
+        <span class="chip">Creative thinking</span>
+        <span class="chip">Problem solving</span>
+        <span class="chip">Communication</span>
+        <span class="chip">Teamwork</span>
+        <span class="chip">Organization</span>
+        <span class="chip">Adaptability</span>
+        <span class="chip">Writing</span>
+        <span class="chip">Research</span>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="reveal">
+    <h3>Let's say hi 👋</h3>
+    <p><a class="mail" href="mailto:yuxiaobohit@gmail.com">yuxiaobohit@gmail.com</a></p>
+    <p class="tiny">Made with ☕ &amp; curiosity · © <span id="year"></span> Latoya</p>
+  </footer>
+
+<script>
+  // current year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // reveal-on-scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('show'); });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
