@@ -340,6 +340,19 @@
     box-shadow:8px 8px 0 var(--purple);outline:none;touch-action:manipulation;
   }
 
+  /* ---------- rocket clicker ---------- */
+  #rocket h2{color:#87ceeb}
+  .rk-design{display:flex;flex-wrap:wrap;gap:22px;margin-bottom:18px}
+  .rk-opt{display:flex;flex-direction:column;gap:8px}
+  .rk-opt>span{font-weight:800;color:#cdd7ff;font-size:.85rem}
+  .rk-opt .racer-colors{margin-bottom:0}
+  #rk-canvas{
+    display:block;width:100%;max-width:340px;height:auto;
+    background:#0a1436;border:3px solid var(--ink);border-radius:16px;
+    box-shadow:8px 8px 0 var(--pink);outline:none;
+    touch-action:manipulation;cursor:pointer;
+  }
+
   /* ---------- footer ---------- */
   footer{
     text-align:center;
@@ -539,6 +552,24 @@
           <button class="dkey" data-action="right">→</button>
         </div>
       </div>
+    </section>
+
+    <section id="rocket" class="reveal">
+      <span class="eyebrow">Mini game</span>
+      <h2>Rocket Clicker 🚀</h2>
+      <p class="game-intro">Click as fast as you can to blast the rocket higher! Every click gives it a boost — stop clicking and gravity pulls it back down. How high can you fly?</p>
+      <p class="racer-pick">Design your rocket:</p>
+      <div class="rk-design">
+        <div class="rk-opt"><span>Body</span><div class="racer-colors" id="rk-body-colors"></div></div>
+        <div class="rk-opt"><span>Nose &amp; fins</span><div class="racer-colors" id="rk-accent-colors"></div></div>
+      </div>
+      <div class="game-stats">
+        <span>Altitude: <strong id="rk-alt">0</strong> m</span>
+        <span>Best: <strong id="rk-best">0</strong> m</span>
+      </div>
+      <canvas id="rk-canvas" width="340" height="520" tabindex="0"></canvas>
+      <p id="rk-msg" class="doom-msg">Click the rocket to launch! 🚀</p>
+      <button id="rk-thrust" class="game-start" type="button">🚀 Click to thrust!</button>
     </section>
 
   </div>
@@ -1150,6 +1181,182 @@
 
     buildColors();
     loadLevel(0);
+    requestAnimationFrame(frame);
+  })();
+  // ---------- rocket clicker ----------
+  (function(){
+    const canvas = document.getElementById('rk-canvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const thrustBtn = document.getElementById('rk-thrust');
+    const altEl = document.getElementById('rk-alt');
+    const bestEl = document.getElementById('rk-best');
+    const msg = document.getElementById('rk-msg');
+
+    const W = canvas.width, H = canvas.height;   // 340 x 520
+    const GROUND_H = 34, groundY = H - GROUND_H;
+    const DESIRED = H*0.42, REACH = groundY - DESIRED;
+    const G = 0.16, THRUST = 2.3, VMAX = 7, TERMINAL = -8.5;
+
+    let worldY = 0, vy = 0, alt = 0, best = 0, flame = 0, launched = false;
+
+    // rocket design (chosen before take-off)
+    const BODY_PAL = ['#f2f2f5','#cfd8e6','#ffd9b0','#c8b6f0','#bfe3f5','#ffd23f','#c8f7dd','#ffc0d3'];
+    const ACCENT_PAL = ['#e0473a','#3a7bd5','#3ddc97','#9b5de5','#ff5d8f','#ff8a3d','#2fd0c0','#1b1033'];
+    let rocketBody = BODY_PAL[0], rocketAccent = ACCENT_PAL[0];
+    function buildSwatches(box, pal, isBody){
+      pal.forEach(function(c){
+        const b=document.createElement('button');
+        b.className='rcolor'+(((isBody?rocketBody:rocketAccent)===c)?' sel':'');
+        b.type='button'; b.style.background=c;
+        b.addEventListener('click', function(){
+          if(isBody) rocketBody=c; else rocketAccent=c;
+          [...box.children].forEach(function(el){ el.classList.remove('sel'); });
+          b.classList.add('sel');
+        });
+        box.appendChild(b);
+      });
+    }
+
+    // deterministic star + cloud fields (world coords, y = altitude above ground)
+    let seed = 1234567;
+    function rnd(){ seed = (seed*1103515245 + 12345) & 0x7fffffff; return seed/0x7fffffff; }
+    const stars = [], clouds = [];
+    for(let i=0;i<90;i++) stars.push({x:rnd()*W, wy:200+rnd()*5000, r:0.6+rnd()*1.6});
+    for(let i=0;i<10;i++) clouds.push({x:rnd()*W, wy:120+rnd()*900, s:0.7+rnd()*0.8});
+
+    function thrust(){
+      vy += THRUST; if(vy>VMAX) vy=VMAX;
+      flame = 9; launched = true;
+      if(msg.textContent.indexOf('Blast')<0) msg.textContent='Blast off! Keep clicking! 🔥';
+    }
+
+    function update(){
+      vy -= G; if(vy<TERMINAL) vy=TERMINAL;
+      worldY += vy;
+      if(worldY<=0){ worldY=0; if(vy<0) vy=0; }
+      if(flame>0) flame--;
+      alt = Math.round(worldY/4);
+      altEl.textContent = alt;
+      if(alt>best){ best=alt; bestEl.textContent=best; }
+    }
+
+    function roundRect(x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);
+      ctx.closePath();
+    }
+
+    function drawRocket(cx, baseY, thrusting){
+      // flame
+      if(thrusting){
+        ctx.fillStyle='#ffd23f';
+        ctx.beginPath();
+        ctx.moveTo(cx-7, baseY);
+        ctx.lineTo(cx+7, baseY);
+        ctx.lineTo(cx, baseY+18+Math.floor(flame*0.8));
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle='#ff7a1a';
+        ctx.beginPath();
+        ctx.moveTo(cx-4, baseY);
+        ctx.lineTo(cx+4, baseY);
+        ctx.lineTo(cx, baseY+11+Math.floor(flame*0.5));
+        ctx.closePath(); ctx.fill();
+      }
+      // fins
+      ctx.fillStyle=rocketAccent;
+      ctx.beginPath(); ctx.moveTo(cx-9,baseY-14); ctx.lineTo(cx-17,baseY); ctx.lineTo(cx-9,baseY); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx+9,baseY-14); ctx.lineTo(cx+17,baseY); ctx.lineTo(cx+9,baseY); ctx.closePath(); ctx.fill();
+      // body
+      ctx.fillStyle=rocketBody;
+      roundRect(cx-9, baseY-52, 18, 52, 9); ctx.fill();
+      ctx.lineWidth=2.5; ctx.strokeStyle='#1b1033'; ctx.stroke();
+      // nose
+      ctx.fillStyle=rocketAccent;
+      ctx.beginPath(); ctx.moveTo(cx-9,baseY-44); ctx.lineTo(cx,baseY-66); ctx.lineTo(cx+9,baseY-44); ctx.closePath(); ctx.fill();
+      // window
+      ctx.fillStyle='#3a7bd5'; ctx.beginPath(); ctx.arc(cx,baseY-30,5,0,Math.PI*2); ctx.fill();
+      ctx.lineWidth=2; ctx.strokeStyle='#1b1033'; ctx.stroke();
+    }
+
+    function draw(){
+      const camY = Math.max(0, worldY - REACH);
+      // sky -> space gradient by altitude
+      const f = Math.min(1, worldY/2400);
+      const g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0, 'rgb('+Math.round(10+ (120-10)*(1-f))+','+Math.round(20+(180-20)*(1-f))+','+Math.round(54+(240-54)*(1-f))+')');
+      g.addColorStop(1, 'rgb('+Math.round(30+(150-30)*(1-f))+','+Math.round(60+(205-60)*(1-f))+','+Math.round(90+(240-90)*(1-f))+')');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      // stars (fade in with altitude)
+      ctx.fillStyle='rgba(255,255,255,'+(0.3+0.7*f)+')';
+      stars.forEach(function(s){
+        const sy = groundY - (s.wy - camY);
+        if(sy>-4 && sy<H){ ctx.beginPath(); ctx.arc(s.x, sy, s.r, 0, Math.PI*2); ctx.fill(); }
+      });
+      // clouds (low altitude)
+      clouds.forEach(function(c){
+        const cyp = groundY - (c.wy - camY);
+        if(cyp>-40 && cyp<H+40){
+          ctx.fillStyle='rgba(255,255,255,.8)';
+          ctx.beginPath();
+          ctx.ellipse(c.x, cyp, 26*c.s, 14*c.s, 0, 0, Math.PI*2);
+          ctx.ellipse(c.x+18*c.s, cyp+4, 18*c.s, 11*c.s, 0, 0, Math.PI*2);
+          ctx.ellipse(c.x-18*c.s, cyp+4, 18*c.s, 11*c.s, 0, 0, Math.PI*2);
+          ctx.fill();
+        }
+      });
+      // best-altitude marker
+      if(best>0){
+        const by = groundY - (best*4 - camY);
+        if(by>10 && by<H){
+          ctx.strokeStyle='rgba(255,210,63,.9)'; ctx.lineWidth=2; ctx.setLineDash([8,6]);
+          ctx.beginPath(); ctx.moveTo(0,by); ctx.lineTo(W,by); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle='#ffd23f'; ctx.font='700 12px "Trebuchet MS",sans-serif'; ctx.textAlign='left'; ctx.textBaseline='bottom';
+          ctx.fillText('Best '+best+'m', 8, by-2);
+        }
+      }
+      // ground (only visible when low)
+      const gY = groundY + camY;
+      if(gY<H){
+        ctx.fillStyle='#4c5a35'; ctx.fillRect(0,gY,W,H-gY);
+        ctx.fillStyle='#6f5240'; ctx.fillRect(W/2-24,gY-6,48,6); // launch pad
+      }
+      // rocket
+      const rocketBaseY = groundY - worldY + camY;
+      drawRocket(W/2, rocketBaseY, flame>0);
+      // hint overlay before launch
+      if(!launched){
+        ctx.fillStyle='rgba(10,15,40,.5)'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle='#fff'; ctx.font='700 20px "Trebuchet MS",sans-serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('Click to launch! 🚀', W/2, H/2);
+      }
+    }
+
+    const STEP=1000/60; let acc=0, last=null;
+    function frame(t){
+      if(last==null) last=t;
+      acc+=Math.min(100,t-last); last=t;
+      while(acc>=STEP){ update(); acc-=STEP; }
+      draw();
+      requestAnimationFrame(frame);
+    }
+
+    // input: clicking = thrust
+    canvas.addEventListener('pointerdown', function(e){ e.preventDefault(); canvas.focus(); thrust(); });
+    thrustBtn.addEventListener('pointerdown', function(e){ e.preventDefault(); thrust(); });
+    document.addEventListener('keydown', function(e){
+      if(document.activeElement!==canvas) return;
+      if(e.code==='Space'||e.code==='ArrowUp'||e.key==='w'){ thrust(); e.preventDefault(); }
+    });
+
+    buildSwatches(document.getElementById('rk-body-colors'), BODY_PAL, true);
+    buildSwatches(document.getElementById('rk-accent-colors'), ACCENT_PAL, false);
+
     requestAnimationFrame(frame);
   })();
 </script>
